@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'ItemsController@index');
+Route::get('settings', 'ItemsController@settings');
+Route::post('updatestyle/{id}', 'ItemsController@saveStyle');
+Route::post('updatecolor/{id}', 'ItemsController@saveColor');
+Route::post('updateposition/{id}', 'ItemsController@savePosition');
