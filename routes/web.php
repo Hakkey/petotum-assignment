@@ -18,3 +18,4 @@ Route::get('settings', 'ItemsController@settings');
 Route::post('updatestyle/{id}', 'ItemsController@saveStyle');
 Route::post('updatecolor/{id}', 'ItemsController@saveColor');
 Route::post('updateposition/{id}', 'ItemsController@savePosition');
+Route::post('updaterowcolumn/{id}', 'ItemsController@saveRowColumn');

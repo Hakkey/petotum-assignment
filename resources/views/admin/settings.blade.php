@@ -23,22 +23,31 @@
     @foreach ($items as $item)
     <div class="row">
       <div class="col">
-        <p>{{ $item->name }}</p>
+        <p>{{ $item['name'] }}</p>
       </div>
       <div class="col">
         <div class="form-group">
-          <select id="styling" class="form-control styling-change" item-id="{{ $item->id }}">
+          <select id="styling" class="form-control styling-change" item-id="{{ $item['id'] }}">
             @foreach ($styles as $style)
-              <option value="{{ $style->name }}" {{ $style->name == $item->styling ? 'selected=selected' : ''}}>{{ $style->name }}</option>
+              <option value="{{ $style->name }}" {{ $style->name == $item['styling'] ? 'selected=selected' : ''}}>{{ $style->name }}</option>
             @endforeach
           </select>
         </div>
       </div>
       <div class="col">
         <div class="form-group">
-          <select class="form-control color-change" item-id="{{ $item->id }}">
+          <select class="form-control color-change" item-id="{{ $item['id'] }}">
             @foreach ($colors as $color)
-              <option value={{ $color->name }} {{ $color->name == $item->color ? 'selected' : ''}}>{{ $color->name }}</option>
+            @if ($color->name == 'dark')
+              <option value={{ $color->name }} {{ $color->name == $item['color'] ? 'selected' : ''}}>black</option>
+            @elseif($color->name == 'primary') 
+            <option value={{ $color->name }} {{ $color->name == $item['color'] ? 'selected' : ''}}>blue</option>
+            @elseif($color->name == 'success') 
+            <option value={{ $color->name }} {{ $color->name == $item['color'] ? 'selected' : ''}}>green</option>
+            @elseif($color->name == 'danger') 
+            <option value={{ $color->name }} {{ $color->name == $item['color'] ? 'selected' : ''}}>red</option>
+            @endif
+              
             @endforeach
           </select>
         </div>
@@ -51,40 +60,27 @@
 <div class="card mt-5 mb-5 shadow">
   <div class="card-body d-flex justify-content-center">
     <table>
-        @for ($r = 1; $r <= $rows; $r++)
-        <tr key="{{ $r }}">
-          @for ($c = 1; $c <= $columns; $c++)
-            @foreach ($items as $item)
-              @if($item->row == $r && $item->column == $c)
-                <td class="droppable"  key="{{ $c }}">
-                  <div class="draggable">{{$item->name}}</div>
-                </td>
-              @else
-                <td class="droppable"></td>
-            @endif
-            @endforeach
-          @endfor
-        </tr>
-        @endfor 
-    </table>
-  </div>
+      @for ($r = 1; $r <= $rows; $r++)
+      <tr key={{ $r }}>
+        @for ($c = 1; $c <= $columns; $c++)    
+          @if ( App\Http\Controllers\ItemsController::getItem($items, $r, $c) != null)
+            <td class="droppable p-1" key={{ $c }} style="cursor: move;">
+              <div class="card bg-diamond draggable" box-id="<?php echo \App\Http\Controllers\ItemsController::getId($items, $r, $c); ?>">
+                <p class="text-white"><?php echo \App\Http\Controllers\ItemsController::getItem($items, $r, $c); ?></p>
+                
+              </div>
+            </td>
+          @else
+            <td class="droppable" key={{ $c }}></td>
+          @endif      
+          
+        @endfor
+      </tr>
+      @endfor
+      </table>
+    </div>
 </div>
 
-{{-- @for ($r = 1; $r <= $rows; $r++)
-        <tr key="{{ $r }}">
-          @for ($c = 1; $c <= $columns; $c++)
-            @foreach ($items as $item)
-              @if($item->row == $r && $item->column == $c)
-                <td class="droppable"  key="{{ $c }}">
-                  <div class="draggable">{{$item->name}}</div>
-                </td>
-              @else
-                <td class="droppable"></td>
-            @endif
-            @endforeach
-          @endfor
-        </tr>
-      @endfor --}}
 
 @endsection
 
@@ -96,8 +92,6 @@
 <script>
   $( document ).ready(function() {
     // alert( "ready!" );
-
-    var prev_val;
 
     $(".styling-change").on('focus', function(event){
       prev_val = this.value;
@@ -205,7 +199,10 @@
       var droppable = this;
 
       var color = $(this).children("option:selected").val();
-      var id = $(this).attr("box-id");
+      var id = draggable.attr('box-id');
+      var row = $(this).parent('tr').attr('key');
+      var column = $(this).attr('key');
+
 
       if ($(droppable).children('.draggable:visible:not(.ui-draggable-dragging)').length > 0) {
         $(droppable).children('.draggable:visible:not(.ui-draggable-dragging)').detach().prependTo(dragLastPlace);
@@ -220,15 +217,16 @@
 
       console.log(id);
 
-      // $.ajax({
-      //   method:'POST',
-      //   url: 'updatecolor/'+ id,
-      //   data: {
-      //     "_token": "{{ csrf_token() }}",
-      //     id:id,
-      //     color:color
-      //     }
-      // });
+      $.ajax({
+        method:'POST',
+        url: 'updaterowcolumn/'+ id,
+        data: {
+          "_token": "{{ csrf_token() }}",
+          id:id,
+          row:row,
+          column:column,
+        }
+      });
     },
     over: function(evt, ui) {
       var draggable = ui.draggable;

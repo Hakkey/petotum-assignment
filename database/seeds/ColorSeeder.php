@@ -13,10 +13,10 @@ class ColorSeeder extends Seeder
     public function run()
     {
         $colors = [
-            ['name' => 'black'],
-            ['name' => 'blue'],
-            ['name' => 'green'],
-            ['name' => 'red'],
+            ['name' => 'dark'],
+            ['name' => 'primary'],
+            ['name' => 'success'],
+            ['name' => 'danger'],
 
         ];
 

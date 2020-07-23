@@ -13,10 +13,10 @@ class StyleSeeder extends Seeder
     public function run()
     {
         $styles = [
-            ['name' => ''],
+            ['name' => 'normal'],
             ['name' => 'bold'],
+            ['name' => 'light'],
             ['name' => 'italic'],
-            ['name' => 'underline'],
         ];
 
         Style::insert($styles);
